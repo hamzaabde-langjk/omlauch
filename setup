@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# 1. Ask the user which style they want
+echo "Which style do you want to set as your main launcher (shell.qml)?"
+echo "1) 3d tree"
+echo "2) card"
+echo "3) game"
+echo "4) iron man"
+echo "5) kill room"
+echo "6) lazy"
+echo "7) simple"
+echo "8) ta da !!"
+echo "9) the 80s"
+read -p "Enter the number (1-9): " choice
+
+# Map the choice to the file name
+case $choice in
+    1) chosen_file="3d tree.qml" ;;
+    2) chosen_file="card.qml" ;;
+    3) chosen_file="game.qml" ;;
+    4) chosen_file="iron man.qml" ;;
+    5) chosen_file="kill room.qml" ;;
+    6) chosen_file="lazy.qml" ;;
+    7) chosen_file="simple.qml" ;;
+    8) chosen_file="ta da !!.qml" ;;
+    9) chosen_file="the 80s.qml" ;;
+    *) echo "Invalid choice. Defaulting to '3d tree'."; chosen_file="3d tree.qml" ;;
+esac
+
+echo "You selected: $chosen_file"
+
+# 2. Create the directory and move/copy the files
+mkdir -p ~/.config/quickshell/tree
+cp ~/tree/apps.js ~/tree/launch-tree.sh ~/tree/list-apps.sh ~/tree/README.md ~/.config/quickshell/tree/ 2>/dev/null
+cp -r ~/tree/styles ~/.config/quickshell/tree/styles
+
+# 3. Create shell.qml by copying the chosen style
+cp "$HOME/tree/styles/$chosen_file" ~/.config/quickshell/tree/shell.qml
+
+# 4. Update launch-tree.sh to point to the correct directory and shell.qml
+sed -i 's|bash "$HOME/.config/quickshell/tree/list-apps.sh"|bash "$HOME/.config/quickshell/tree/list-apps.sh"|' ~/.config/quickshell/tree/launch-tree.sh
+sed -i 's|exec quickshell -c "$HOME/.config/quickshell/tree"|exec quickshell -c "$HOME/.config/quickshell/tree/shell.qml"|' ~/.config/quickshell/tree/launch-tree.sh
+
+# 5. Make scripts executable
+chmod +x ~/.config/quickshell/tree/launch-tree.sh ~/.config/quickshell/tree/list-apps.sh
+
+# 6. Append the binding to /home/hamza/.config/hypr/bindings.lua
+echo 'o.bind("SUPER + U", "quickshell onoff", "~/.config/quickshell/tree/launch-tree.sh")' >> /home/hamza/.config/hypr/bindings.lua
+
+echo "Done! Launcher set to '$chosen_file' and bound to SUPER + U."
